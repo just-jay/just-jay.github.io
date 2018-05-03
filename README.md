@@ -1,2 +1,4 @@
 # just-jay.github.io
-readme!
+This repository contains:
+
+- My final project for CMSC320 (Introduction to Data Science) taken in my Spring 2018 semester at UMD
