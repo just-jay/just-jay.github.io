@@ -1,0 +1,109 @@
+---
+title: "final-project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+
+
+
+```{r}
+### CUBING ###
+
+
+### SETUP ###
+#In this section we connect to the webpage, and take all the data that we want from the HTML
+
+url = 'https://www.worldcubeassociation.org/results/events.php' #the URL 
+webpage = read_html(url)
+page_html <- html_nodes(webpage,'tr')
+competitors <- html_text(page_html)
+competitors <- competitors[-c(1,2,3,4)] #remove unnecessary <tr>s
+
+### DIVDING UP THE DATA ###
+# After getting the data from each <tr>, it's difficult ot break it up into each section due to how it is formatted. So what I will attempt in the following code blocks will be to insert "--" between each section in the string, and then laster split on that "--" in order to get each section.
+
+### FIX MISSING DATA ###
+#Some data is missing. Specifically, some entries don't have a number associated with them (because they are tied in the database) so here we add a number to those entries.
+#Also, if there is no number at the front, add -- to the front
+
+i = 1
+curr = 1
+for(string in competitors){
+  c <- substring(string, 1,1)
+  if(c!=1&c!=2&c!=3&c!=4&c!=5&c!=6&c!=7&c!=8&c!=9){ #if there is no number in the first char of the string
+    n <- paste(curr, "--") #add the seperator "--"
+    competitors[i] <- paste(n,competitors[i]) #update each string
+  } else {
+    curr = i
+  }
+  i <- i+1
+}
+
+### REGEXES TO SPLIT THE DATA ###
+#Next, we're going to use some regexes to split the data more and add some more of the markers "--" to divide the data
+
+competitors <- competitors %>% 
+  gsub("\\(.*\\)","",.) %>% #remove (...) that exist in the data
+  gsub("([A-z | //)])(\\d\\.\\d\\d)", '\\1--\\2', .) %>% #used to split the time from the name 
+  gsub("(\\d)([A-z])", '\\1--\\2', .) #also used to split the time from the name
+
+#the person at 25 had a weird char in their name that the regexes didn't like, so I handled splitting his name seperately heres
+rep <- "25--"
+competitors[25] <- paste(rep, gsub('25','',competitors[25]))
+competitors <- strsplit(competitors, "--")
+
+### CREATING CHARACTER VECTORS FOR THE TABLE ###
+#Next we want to make each of the columns in the table. So, we can use a for loop to put the parts of each string into an array that will become a column
+
+rankC <- character()
+personC <- character()
+resultC <- character()
+restC <- character()
+
+for(p in competitors){
+  rankC <- c(rankC, p[1])
+  personC <- c(personC, p[2])
+  resultC <- c(resultC, p[3])
+  restC <- c(restC, p[4])
+}
+
+### DEALING WITH RESTC ###
+#The 'Citizen of' and Competition part of each data was a bit too hard to parse in the previous section due to how the <tr> formatted it, so I decided to parse them here instead.
+
+restC <- restC %>% #here I add the marker bewteen the two sections
+    gsub("([a-z])([A-Z]+)",'\\1--\\2',.)
+
+restC <- stri_split_fixed(str = restC, pattern = "--", n = 2) #then I split the string on the pattern "--"
+
+citizenC <- character()
+competitionC <- character()
+
+for(c in restC){ #lastly I go through and separate the strings into the citizen of and competition sections
+  i<-0
+  for(j in c){
+     if(i==0){
+       citizenC<-c(citizenC,j)
+       i<-1+1
+     } else {
+       competitionC<-c(competitionC,gsub("--","",j))
+     }
+  }
+}
+
+
+### MAKE THE DATA FRAME ###
+#Lastly, we take all the vectors we made and put it into a data frame to make tge 
+
+df <- data.frame(rankC,personC,resultC,citizenC,competitionC,stringsAsFactors=FALSE)
+names(df) <- c("Rank","Person","Result","Citizen of", "Competition")
+df$Result <- as.double(as.character(df$Result)) #change the type of result to double
+df$Rank <- as.integer(as.character(df$Rank)) #change the type of rank to integer
+df
+
+```
