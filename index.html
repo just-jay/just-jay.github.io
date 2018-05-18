@@ -120,19 +120,17 @@ $(document).ready(function () {
 
 </div>
 
-###########################################################
-### CMSC320 FINAL PROJECT: ANALYSIS OF SPEEDCUBING DATA ###
-### BY: Jacob Elspas                                    ###
-###########################################################
+<p>
 ### BACKGROUND / DESCRIPTION ###
-#The purpose of this project is to edcuate the reader on different principles and properties of the data curation pipeline. This will include Data Curation, Parsing, Hypothesis Testing, and Predcitive Analysis. Throughout this tutorial we will construct and analyze a dataset inorder to understand and apply these properties.
-
-# In order to analye data, we first need to get some. For this tutorial we iwll be looking at a dataset of the fastest single times to solve a Rubik's Cube done in a regulated competition.Competitive Rubik's Cube solving, also known as speed cubing, is as simple as it sounds: solve a Rubik's cube in the fastest time possible. I am a speedcuber, and I thought it would be interesting to take data from the top 300 single solves and see if I could find some patterns within the data. 
-
+The purpose of this project is to edcuate the reader on different principles and properties of the data curation pipeline. This will include Data Curation, Parsing, Hypothesis Testing, and Predcitive Analysis. Throughout this tutorial we will construct and analyze a dataset inorder to understand and apply these properties.
+In order to analye data, we first need to get some. For this tutorial we iwll be looking at a dataset of the fastest single times to solve a Rubik's Cube done in a regulated competition.Competitive Rubik's Cube solving, also known as speed cubing, is as simple as it sounds: solve a Rubik's cube in the fastest time possible. I am a speedcuber, and I thought it would be interesting to take data from the top 300 single solves and see if I could find some patterns within the data. 
+</p>
+  
+<p>
 ##NOTE##
-#The times in this data all range within a couple of seconds. As such, the results that we find and the trends that we discover may only show increases/decreases as small as a second or even less. While generally this is not significant, since the times are all relatively close and really fast, time intervals less than a second are significant. I'll be sure to stress this more as the analysis goes on, but I wanted to address it here before any analysis takes place so you the reader are aware. And with that, let's start looking at some Speedcubing data!
-
-
+The times in this data all range within a couple of seconds. As such, the results that we find and the trends that we discover may only show increases/decreases as small as a second or even less. While generally this is not significant, since the times are all relatively close and really fast, time intervals less than a second are significant. I'll be sure to stress this more as the analysis goes on, but I wanted to address it here before any analysis takes place so you the reader are aware. And with that, let's start looking at some Speedcubing data!
+</p>
+  
 <pre class="r"><code>
 
 ########################
@@ -250,13 +248,14 @@ as.tibble(df)</code></pre>
 ##  9     9 Antonie Paterakis   4.89 Greece            The Hague Open 2017   
 ## 10    10 Lucas Etter         4.90 United States     River Hill Fall 2015  
 ## # ... with 282 more rows</code></pre>
+
+  Now that we have this table, let's take a look at the data. We can use different graphs to see the relationships between different parts of the data
+
+there are two main ways that we will start looking at the data: How peoples time relate to the year in which their solved happened, and how peoples' solves relate to each other
+
+The first thing we can look at is look at all the times across the years and see if there is a trend of people getting faster. To do this we must first make a new column, year.
+  
 <pre class="r"><code>### ADDING A YEAR COLUMN ###
-
-#Now that we have this table, let's take a look at the data. We can use different graphs to see the relationships between different parts of the data
-
-# there are two main ways that we will start looking at the data: How peoples time relate to the year in which their solved happened, and how peoples' solves relate to each other
-
-#The first thing we can look at is look at all the times across the years and see if there is a trend of people getting faster. To do this we must first make a new column, year.
 
 df[&quot;Year&quot;] &lt;- str_extract(df$Competition,&quot;\\d{4}&quot;) #get the year, make a new column
 df$Year &lt;- as.integer(as.character(df$Year)) #change the type of year to integer
